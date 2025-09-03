@@ -226,8 +226,8 @@ resource "aws_iam_role" "vpc_cni" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub": "system:serviceaccount:kube-system:aws-node"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud": "sts.amazonaws.com"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:aws-node"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
           }
         }
       }
@@ -260,8 +260,8 @@ resource "aws_iam_role" "ebs_csi" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud": "sts.amazonaws.com"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
           }
         }
       }
@@ -294,8 +294,8 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud": "sts.amazonaws.com"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
           }
         }
       }
@@ -350,46 +350,6 @@ resource "aws_iam_role_policy" "aws_load_balancer_controller_additional" {
           "elasticloadbalancing:DescribeTags"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "cognito-idp:DescribeUserPoolClient",
-          "acm:ListCertificates",
-          "acm:DescribeCertificate",
-          "iam:ListServerCertificates",
-          "iam:GetServerCertificate",
-          "waf-regional:GetWebACL",
-          "waf-regional:GetWebACLForResource",
-          "waf-regional:AssociateWebACL",
-          "waf-regional:DisassociateWebACL",
-          "wafv2:GetWebACL",
-          "wafv2:GetWebACLForResource",
-          "wafv2:AssociateWebACL",
-          "wafv2:DisassociateWebACL",
-          "shield:DescribeProtection",
-          "shield:GetSubscriptionState",
-          "shield:DescribeSubscription",
-          "shield:CreateProtection",
-          "shield:DeleteProtection"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:CreateSecurityGroup",
-          "ec2:CreateTags"
-        ]
-        Resource = "arn:aws:ec2:*:*:security-group/*"
-        Condition = {
-          StringEquals = {
-            "ec2:CreateAction" = "CreateSecurityGroup"
-          }
-          Null = {
-            "aws:RequestedRegion" = "false"
-          }
-        }
       }
     ]
   })

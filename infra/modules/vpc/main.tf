@@ -30,9 +30,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                        = "drazex-eks-public-subnet-${count.index + 1}-${var.environment}"
-    Environment                 = var.environment
-    "kubernetes.io/role/elb"    = "1"
+    Name                                                         = "drazex-eks-public-subnet-${count.index + 1}-${var.environment}"
+    Environment                                                  = var.environment
+    "kubernetes.io/role/elb"                                     = "1"
     "kubernetes.io/cluster/drazex-eks-cluster-${var.environment}" = "shared"
   }
 }
@@ -45,9 +45,9 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name                                 = "drazex-eks-private-subnet-${count.index + 1}-${var.environment}"
-    Environment                          = var.environment
-    "kubernetes.io/role/internal-elb"    = "1"
+    Name                                                         = "drazex-eks-private-subnet-${count.index + 1}-${var.environment}"
+    Environment                                                  = var.environment
+    "kubernetes.io/role/internal-elb"                            = "1"
     "kubernetes.io/cluster/drazex-eks-cluster-${var.environment}" = "shared"
   }
 }
