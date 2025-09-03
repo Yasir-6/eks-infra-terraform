@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket         = "drazex-eks-terraform-statefiles"
     key            = "dev/eks/terraform.tfstate"
-    region         = "us-east-2"
+    region         = "us-east-1"
     dynamodb_table = "drazex-eks-terraform-state-lock"
     encrypt        = true
   }
@@ -13,12 +13,12 @@ data "terraform_remote_state" "vpc" {
   config = {
     bucket = "drazex-eks-terraform-statefiles"
     key    = "dev/vpc/terraform.tfstate"
-    region = "us-east-2"
+    region = "us-east-1"
   }
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
 
 module "eks" {
