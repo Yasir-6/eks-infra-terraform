@@ -18,7 +18,7 @@ on:
           - prod
 
 env:
-  AWS_REGION: us-east-2
+  AWS_REGION: us-east-1
   TF_STATE_BUCKET: "drazex-eks-terraform-statefiles-12345"
   TF_STATE_LOCK_TABLE: "drazex-eks-terraform-state-lock"
 
