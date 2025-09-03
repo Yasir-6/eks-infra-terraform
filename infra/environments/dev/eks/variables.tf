@@ -1,13 +1,13 @@
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.32"
+  default     = "1.30"
 }
 
 variable "endpoint_public_access" {
   description = "Enable public API server endpoint"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "public_access_cidrs" {

@@ -2,7 +2,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# S3 bucket for storing Terraform states
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "drazex-eks-terraform-statefiles"
 
@@ -43,11 +42,10 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
   restrict_public_buckets = true
 }
 
-# DynamoDB table for state locking
 resource "aws_dynamodb_table" "terraform_state_lock" {
-  name           = "drazex-eks-terraform-state-lock"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = "drazex-eks-terraform-state-lock"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"

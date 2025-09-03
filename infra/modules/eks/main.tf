@@ -1,7 +1,3 @@
-############################################
-# IAM Roles for EKS
-############################################
-
 resource "aws_iam_role" "eks_cluster" {
   name = "drazex-eks-cluster-role-${var.environment}"
 
@@ -9,8 +5,8 @@ resource "aws_iam_role" "eks_cluster" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "eks.amazonaws.com"
         }
@@ -36,8 +32,8 @@ resource "aws_iam_role" "eks_node" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
           Service = "ec2.amazonaws.com"
         }
@@ -65,10 +61,6 @@ resource "aws_iam_role_policy_attachment" "eks_container_registry_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_node.name
 }
-
-############################################
-# Security Groups
-############################################
 
 resource "aws_security_group" "eks_cluster" {
   name        = "drazex-eks-cluster-sg-${var.environment}"
@@ -127,10 +119,6 @@ resource "aws_security_group" "eks_nodes" {
   }
 }
 
-############################################
-# CloudWatch Logs
-############################################
-
 resource "aws_cloudwatch_log_group" "eks" {
   name              = "/aws/eks/drazex-eks-cluster-${var.environment}/cluster"
   retention_in_days = var.log_retention_days
@@ -140,10 +128,6 @@ resource "aws_cloudwatch_log_group" "eks" {
     Environment = var.environment
   }
 }
-
-############################################
-# EKS Cluster
-############################################
 
 resource "aws_eks_cluster" "main" {
   name     = "drazex-eks-cluster-${var.environment}"
@@ -170,10 +154,6 @@ resource "aws_eks_cluster" "main" {
     Environment = var.environment
   }
 }
-
-############################################
-# EKS Node Group
-############################################
 
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
@@ -204,13 +184,9 @@ resource "aws_eks_node_group" "main" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
-    aws_iam_role_policy_attachment.eks_container_registry_policy
+    aws_iam_role_policy_attachment.eks_container_registry_policy,
   ]
 }
-
-############################################
-# OIDC Provider
-############################################
 
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
@@ -227,10 +203,6 @@ resource "aws_iam_openid_connect_provider" "eks" {
   }
 }
 
-############################################
-# IAM Roles for Addons
-############################################
-
 resource "aws_iam_role" "vpc_cni" {
   name = "drazex-eks-vpc-cni-role-${var.environment}"
 
@@ -238,11 +210,11 @@ resource "aws_iam_role" "vpc_cni" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect    = "Allow"
+        Effect = "Allow"
         Principal = {
           Federated = aws_iam_openid_connect_provider.eks.arn
         }
-        Action    = "sts:AssumeRoleWithWebIdentity"
+        Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
             "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-node"
@@ -271,11 +243,11 @@ resource "aws_iam_role" "ebs_csi" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect    = "Allow"
+        Effect = "Allow"
         Principal = {
           Federated = aws_iam_openid_connect_provider.eks.arn
         }
-        Action    = "sts:AssumeRoleWithWebIdentity"
+        Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
             "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
@@ -296,10 +268,6 @@ resource "aws_iam_role_policy_attachment" "ebs_csi" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/Amazon_EBS_CSI_DriverPolicy"
   role       = aws_iam_role.ebs_csi.name
 }
-
-############################################
-# EKS Addons
-############################################
 
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name                = aws_eks_cluster.main.name
