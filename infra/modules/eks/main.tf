@@ -1,4 +1,3 @@
-# EKS Cluster Role
 resource "aws_iam_role" "eks_cluster" {
   name = "drazex-eks-cluster-role-${var.environment}"
 
@@ -26,7 +25,6 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   role       = aws_iam_role.eks_cluster.name
 }
 
-# EKS Node Role
 resource "aws_iam_role" "eks_node" {
   name = "drazex-eks-node-role-${var.environment}"
 
@@ -64,7 +62,6 @@ resource "aws_iam_role_policy_attachment" "eks_container_registry_policy" {
   role       = aws_iam_role.eks_node.name
 }
 
-# Security Group for EKS Cluster
 resource "aws_security_group" "eks_cluster" {
   name        = "drazex-eks-cluster-sg-${var.environment}"
   description = "Security group for EKS cluster"
@@ -90,7 +87,6 @@ resource "aws_security_group" "eks_cluster" {
   }
 }
 
-# Security Group for EKS Nodes
 resource "aws_security_group" "eks_nodes" {
   name        = "drazex-eks-nodes-sg-${var.environment}"
   description = "Security group for EKS nodes"
@@ -123,7 +119,6 @@ resource "aws_security_group" "eks_nodes" {
   }
 }
 
-# CloudWatch Log Group for EKS
 resource "aws_cloudwatch_log_group" "eks" {
   name              = "/aws/eks/drazex-eks-cluster-${var.environment}/cluster"
   retention_in_days = var.log_retention_days
@@ -134,7 +129,6 @@ resource "aws_cloudwatch_log_group" "eks" {
   }
 }
 
-# EKS Cluster
 resource "aws_eks_cluster" "main" {
   name     = "drazex-eks-cluster-${var.environment}"
   role_arn = aws_iam_role.eks_cluster.arn
@@ -161,7 +155,6 @@ resource "aws_eks_cluster" "main" {
   }
 }
 
-# EKS Node Group
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "drazex-eks-nodes-${var.environment}"
@@ -195,7 +188,6 @@ resource "aws_eks_node_group" "main" {
   ]
 }
 
-# OIDC Provider
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
@@ -211,7 +203,6 @@ resource "aws_iam_openid_connect_provider" "eks" {
   }
 }
 
-# IAM Role for VPC CNI
 resource "aws_iam_role" "vpc_cni" {
   name = "drazex-eks-vpc-cni-role-${var.environment}"
 
@@ -226,8 +217,8 @@ resource "aws_iam_role" "vpc_cni" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:aws-node"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-node"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
       }
@@ -245,7 +236,6 @@ resource "aws_iam_role_policy_attachment" "vpc_cni" {
   role       = aws_iam_role.vpc_cni.name
 }
 
-# IAM Role for EBS CSI
 resource "aws_iam_role" "ebs_csi" {
   name = "drazex-eks-ebs-csi-role-${var.environment}"
 
@@ -260,8 +250,8 @@ resource "aws_iam_role" "ebs_csi" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
       }
@@ -279,83 +269,6 @@ resource "aws_iam_role_policy_attachment" "ebs_csi" {
   role       = aws_iam_role.ebs_csi.name
 }
 
-# IAM Role for AWS Load Balancer Controller
-resource "aws_iam_role" "aws_load_balancer_controller" {
-  name = "drazex-eks-aws-load-balancer-controller-${var.environment}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = aws_iam_openid_connect_provider.eks.arn
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub" : "system:serviceaccount:kube-system:aws-load-balancer-controller"
-            "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud" : "sts.amazonaws.com"
-          }
-        }
-      }
-    ]
-  })
-
-  tags = {
-    Name        = "drazex_eks_aws_load_balancer_controller_role"
-    Environment = var.environment
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller" {
-  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
-  role       = aws_iam_role.aws_load_balancer_controller.name
-}
-
-resource "aws_iam_role_policy" "aws_load_balancer_controller_additional" {
-  name = "AWSLoadBalancerControllerAdditionalIAMPolicy"
-  role = aws_iam_role.aws_load_balancer_controller.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "iam:CreateServiceLinkedRole",
-          "ec2:DescribeAccountAttributes",
-          "ec2:DescribeAddresses",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeInternetGateways",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeVpcPeeringConnections",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeInstances",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeTags",
-          "ec2:GetCoipPoolUsage",
-          "ec2:GetIpamPoolCidrs",
-          "ec2:DescribeCoipPools",
-          "elasticloadbalancing:DescribeLoadBalancers",
-          "elasticloadbalancing:DescribeLoadBalancerAttributes",
-          "elasticloadbalancing:DescribeListeners",
-          "elasticloadbalancing:DescribeListenerCertificates",
-          "elasticloadbalancing:DescribeSSLPolicies",
-          "elasticloadbalancing:DescribeRules",
-          "elasticloadbalancing:DescribeTargetGroups",
-          "elasticloadbalancing:DescribeTargetGroupAttributes",
-          "elasticloadbalancing:DescribeTargetHealth",
-          "elasticloadbalancing:DescribeTags"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-# EKS Add-ons
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name                = aws_eks_cluster.main.name
   addon_name                  = "vpc-cni"
@@ -390,33 +303,6 @@ resource "aws_eks_addon" "ebs_csi" {
   addon_version               = var.ebs_csi_version
   resolve_conflicts_on_create = "OVERWRITE"
   service_account_role_arn    = aws_iam_role.ebs_csi.arn
-
-  depends_on = [aws_eks_node_group.main]
-}
-
-resource "aws_eks_addon" "aws_efs_csi_driver" {
-  cluster_name                = aws_eks_cluster.main.name
-  addon_name                  = "aws-efs-csi-driver"
-  addon_version               = var.efs_csi_version
-  resolve_conflicts_on_create = "OVERWRITE"
-
-  depends_on = [aws_eks_node_group.main]
-}
-
-resource "aws_eks_addon" "aws_guardduty_agent" {
-  count                       = var.enable_guardduty_agent ? 1 : 0
-  cluster_name                = aws_eks_cluster.main.name
-  addon_name                  = "aws-guardduty-agent"
-  resolve_conflicts_on_create = "OVERWRITE"
-
-  depends_on = [aws_eks_node_group.main]
-}
-
-resource "aws_eks_addon" "adot" {
-  count                       = var.enable_adot ? 1 : 0
-  cluster_name                = aws_eks_cluster.main.name
-  addon_name                  = "adot"
-  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }

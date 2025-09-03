@@ -22,7 +22,6 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 
-# Outputs
 output "drazex_eks_vpc_id" {
   value = module.vpc.vpc_id
 }

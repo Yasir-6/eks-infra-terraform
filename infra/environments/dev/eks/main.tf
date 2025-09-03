@@ -49,7 +49,6 @@ module "eks" {
   enable_adot           = var.enable_adot
 }
 
-# Outputs
 output "drazex_eks_cluster_id" {
   value = module.eks.cluster_id
 }
