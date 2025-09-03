@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "drazex-eks-terraform-statefiles"
+  bucket = "drazex-eks-terraform-statefiles-12345"
 
   lifecycle {
     prevent_destroy = true

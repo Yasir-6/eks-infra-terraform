@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-2
   ENVIRONMENT: dev
-  TF_STATE_BUCKET: "drazex-eks-terraform-statefiles"
+  TF_STATE_BUCKET: "drazex-eks-terraform-statefiles-12345"
   TF_STATE_LOCK_TABLE: "drazex-eks-terraform-state-lock"
 
 permissions:

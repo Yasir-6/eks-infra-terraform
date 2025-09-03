@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket         = "drazex-eks-terraform-statefiles"
+    bucket         = "drazex-eks-terraform-statefiles-12345"
     key            = "dev/vpc/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "drazex-eks-terraform-state-lock"
