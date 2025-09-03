@@ -1,4 +1,4 @@
-name: 'EKS Terraform Destroy'
+name: Destroy EKS Infrastructure
 
 on:
   workflow_dispatch:
@@ -7,74 +7,174 @@ on:
         description: 'Type "destroy" to confirm'
         required: true
         default: ''
+      environment:
+        description: 'Environment to destroy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AWS_REGION: us-east-2
+  TF_STATE_BUCKET: "drazex-eks-terraform-statefiles"
+  TF_STATE_LOCK_TABLE: "drazex-eks-terraform-state-lock"
 
 permissions:
   contents: read
 
 jobs:
-  destroy-eks:
-    name: 'Destroy EKS'
+  validate-destroy:
+    name: Validate Destroy Request
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_destroy == 'destroy'
+    outputs:
+      should_destroy: ${{ steps.validate.outputs.proceed }}
+    
+    steps:
+      - name: Validate inputs
+        id: validate
+        run: |
+          if [ "${{ github.event.inputs.confirm_destroy }}" = "destroy" ]; then
+            echo "Destroy confirmed for environment: ${{ github.event.inputs.environment }}"
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Destroy not confirmed"
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          fi
+
+  disable-prevent-destroy:
+    name: Disable Prevent Destroy
+    needs: validate-destroy
+    if: needs.validate-destroy.outputs.should_destroy == 'true'
     runs-on: ubuntu-latest
     environment: production
-    if: github.event.inputs.confirm_destroy == 'destroy'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
+      - name: Disable prevent_destroy in backend
+        run: |
+          if [ -f "./infra/environments/backend/main.tf" ]; then
+            sed -i 's/prevent_destroy = true/prevent_destroy = false/g' ./infra/environments/backend/main.tf
+            echo "Disabled prevent_destroy in backend configuration"
+          fi
+
+      - name: Upload modified files
+        uses: actions/upload-artifact@v3
+        with:
+          name: modified-backend
+          path: ./infra/environments/backend/
+
+  destroy-eks:
+    name: Destroy EKS Cluster
+    needs: [validate-destroy, disable-prevent-destroy]
+    if: needs.validate-destroy.outputs.should_destroy == 'true'
+    runs-on: ubuntu-latest
+    environment: production
     defaults:
       run:
-        shell: bash
-        working-directory: ./infra/environments/dev/eks
+        working-directory: ./infra/environments/${{ github.event.inputs.environment }}/eks
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "1.6.0"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ env.TF_STATE_LOCK_TABLE }}"
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve -input=false
+      - name: Terraform Destroy EKS
+        run: terraform destroy -auto-approve -input=false
 
   destroy-vpc:
-    name: 'Destroy VPC'
+    name: Destroy VPC
+    needs: destroy-eks
     runs-on: ubuntu-latest
     environment: production
-    needs: destroy-eks
-    if: github.event.inputs.confirm_destroy == 'destroy'
-
     defaults:
       run:
-        shell: bash
-        working-directory: ./infra/environments/dev/vpc
+        working-directory: ./infra/environments/${{ github.event.inputs.environment }}/vpc
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "1.6.0"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ env.TF_STATE_LOCK_TABLE }}"
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve -input=false
+      - name: Terraform Destroy VPC
+        run: terraform destroy -auto-approve -input=false
+
+  cleanup-backend:
+    name: Cleanup Backend (Optional)
+    needs: destroy-vpc
+    if: github.event.inputs.environment == 'dev'
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: ./infra/environments/backend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download modified backend
+        uses: actions/download-artifact@v3
+        with:
+          name: modified-backend
+          path: ./infra/environments/backend/
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy Backend
+        run: terraform destroy -auto-approve -input=false
+        continue-on-error: true

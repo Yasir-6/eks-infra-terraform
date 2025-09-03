@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "hutch-eks-terraform-statefiles"
+    bucket         = "drazex-eks-terraform-statefiles"
     key            = "dev/eks/terraform.tfstate"
     region         = "us-east-2"
-    dynamodb_table = "eks-terraform-state-lock"
+    dynamodb_table = "drazex-eks-terraform-state-lock"
     encrypt        = true
   }
 }
@@ -11,7 +11,7 @@ terraform {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "hutch-eks-terraform-statefiles"
+    bucket = "drazex-eks-terraform-statefiles"
     key    = "dev/vpc/terraform.tfstate"
     region = "us-east-2"
   }
@@ -25,9 +25,9 @@ module "eks" {
   source = "../../../modules/eks"
 
   environment            = "dev"
-  vpc_id                = data.terraform_remote_state.vpc.outputs.hutch_eks_vpc_id
-  vpc_cidr              = data.terraform_remote_state.vpc.outputs.hutch_eks_vpc_cidr_block
-  private_subnet_ids    = data.terraform_remote_state.vpc.outputs.hutch_eks_private_subnet_ids
+  vpc_id                = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_id
+  vpc_cidr              = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_cidr_block
+  private_subnet_ids    = data.terraform_remote_state.vpc.outputs.drazex_eks_private_subnet_ids
   kubernetes_version    = var.kubernetes_version
   endpoint_public_access = var.endpoint_public_access
   public_access_cidrs   = var.public_access_cidrs
@@ -50,42 +50,42 @@ module "eks" {
 }
 
 # Outputs
-output "hutch_eks_cluster_id" {
+output "drazex_eks_cluster_id" {
   value = module.eks.cluster_id
 }
 
-output "hutch_eks_cluster_arn" {
+output "drazex_eks_cluster_arn" {
   value = module.eks.cluster_arn
 }
 
-output "hutch_eks_cluster_endpoint" {
+output "drazex_eks_cluster_endpoint" {
   value = module.eks.cluster_endpoint
 }
 
-output "hutch_eks_cluster_name" {
+output "drazex_eks_cluster_name" {
   value = module.eks.cluster_name
 }
 
-output "hutch_eks_cluster_version" {
+output "drazex_eks_cluster_version" {
   value = module.eks.cluster_version
 }
 
-output "hutch_eks_cluster_security_group_id" {
+output "drazex_eks_cluster_security_group_id" {
   value = module.eks.cluster_security_group_id
 }
 
-output "hutch_eks_node_security_group_id" {
+output "drazex_eks_node_security_group_id" {
   value = module.eks.node_security_group_id
 }
 
-output "hutch_eks_node_group_arn" {
+output "drazex_eks_node_group_arn" {
   value = module.eks.node_group_arn
 }
 
-output "hutch_eks_cluster_certificate_authority_data" {
+output "drazex_eks_cluster_certificate_authority_data" {
   value = module.eks.cluster_certificate_authority_data
 }
 
-output "hutch_eks_cluster_oidc_issuer_url" {
+output "drazex_eks_cluster_oidc_issuer_url" {
   value = module.eks.cluster_oidc_issuer_url
 }

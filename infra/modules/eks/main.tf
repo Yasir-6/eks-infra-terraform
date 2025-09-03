@@ -1,6 +1,6 @@
 # EKS Cluster Role
 resource "aws_iam_role" "eks_cluster" {
-  name = "hutch-eks-cluster-role-${var.environment}"
+  name = "drazex-eks-cluster-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "eks_cluster" {
   })
 
   tags = {
-    Name        = "hutch_eks_cluster_role"
+    Name        = "drazex_eks_cluster_role"
     Environment = var.environment
   }
 }
@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 
 # EKS Node Role
 resource "aws_iam_role" "eks_node" {
-  name = "hutch-eks-node-role-${var.environment}"
+  name = "drazex-eks-node-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -44,7 +44,7 @@ resource "aws_iam_role" "eks_node" {
   })
 
   tags = {
-    Name        = "hutch_eks_node_role"
+    Name        = "drazex_eks_node_role"
     Environment = var.environment
   }
 }
@@ -66,7 +66,7 @@ resource "aws_iam_role_policy_attachment" "eks_container_registry_policy" {
 
 # Security Group for EKS Cluster
 resource "aws_security_group" "eks_cluster" {
-  name        = "hutch-eks-cluster-sg-${var.environment}"
+  name        = "drazex-eks-cluster-sg-${var.environment}"
   description = "Security group for EKS cluster"
   vpc_id      = var.vpc_id
 
@@ -85,14 +85,14 @@ resource "aws_security_group" "eks_cluster" {
   }
 
   tags = {
-    Name        = "hutch_eks_cluster_security_group"
+    Name        = "drazex_eks_cluster_security_group"
     Environment = var.environment
   }
 }
 
 # Security Group for EKS Nodes
 resource "aws_security_group" "eks_nodes" {
-  name        = "hutch-eks-nodes-sg-${var.environment}"
+  name        = "drazex-eks-nodes-sg-${var.environment}"
   description = "Security group for EKS nodes"
   vpc_id      = var.vpc_id
 
@@ -118,25 +118,25 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   tags = {
-    Name        = "hutch_eks_nodes_security_group"
+    Name        = "drazex_eks_nodes_security_group"
     Environment = var.environment
   }
 }
 
 # CloudWatch Log Group for EKS
 resource "aws_cloudwatch_log_group" "eks" {
-  name              = "/aws/eks/hutch-eks-cluster-${var.environment}/cluster"
+  name              = "/aws/eks/drazex-eks-cluster-${var.environment}/cluster"
   retention_in_days = var.log_retention_days
 
   tags = {
-    Name        = "hutch_eks_log_group"
+    Name        = "drazex_eks_log_group"
     Environment = var.environment
   }
 }
 
 # EKS Cluster
 resource "aws_eks_cluster" "main" {
-  name     = "hutch-eks-cluster-${var.environment}"
+  name     = "drazex-eks-cluster-${var.environment}"
   role_arn = aws_iam_role.eks_cluster.arn
   version  = var.kubernetes_version
 
@@ -156,7 +156,7 @@ resource "aws_eks_cluster" "main" {
   ]
 
   tags = {
-    Name        = "hutch_eks_cluster"
+    Name        = "drazex_eks_cluster"
     Environment = var.environment
   }
 }
@@ -164,7 +164,7 @@ resource "aws_eks_cluster" "main" {
 # EKS Node Group
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "hutch-eks-nodes-${var.environment}"
+  node_group_name = "drazex-eks-nodes-${var.environment}"
   node_role_arn   = aws_iam_role.eks_node.arn
   subnet_ids      = var.private_subnet_ids
 
@@ -184,7 +184,7 @@ resource "aws_eks_node_group" "main" {
   }
 
   tags = {
-    Name        = "hutch_eks_node_group"
+    Name        = "drazex_eks_node_group"
     Environment = var.environment
   }
 
@@ -206,14 +206,14 @@ resource "aws_iam_openid_connect_provider" "eks" {
   url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 
   tags = {
-    Name        = "hutch_eks_oidc_provider"
+    Name        = "drazex_eks_oidc_provider"
     Environment = var.environment
   }
 }
 
 # IAM Role for VPC CNI
 resource "aws_iam_role" "vpc_cni" {
-  name = "hutch-eks-vpc-cni-role-${var.environment}"
+  name = "drazex-eks-vpc-cni-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -235,7 +235,7 @@ resource "aws_iam_role" "vpc_cni" {
   })
 
   tags = {
-    Name        = "hutch_eks_vpc_cni_role"
+    Name        = "drazex_eks_vpc_cni_role"
     Environment = var.environment
   }
 }
@@ -247,7 +247,7 @@ resource "aws_iam_role_policy_attachment" "vpc_cni" {
 
 # IAM Role for EBS CSI
 resource "aws_iam_role" "ebs_csi" {
-  name = "hutch-eks-ebs-csi-role-${var.environment}"
+  name = "drazex-eks-ebs-csi-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -269,7 +269,7 @@ resource "aws_iam_role" "ebs_csi" {
   })
 
   tags = {
-    Name        = "hutch_eks_ebs_csi_role"
+    Name        = "drazex_eks_ebs_csi_role"
     Environment = var.environment
   }
 }
@@ -281,7 +281,7 @@ resource "aws_iam_role_policy_attachment" "ebs_csi" {
 
 # IAM Role for AWS Load Balancer Controller
 resource "aws_iam_role" "aws_load_balancer_controller" {
-  name = "hutch-eks-aws-load-balancer-controller-${var.environment}"
+  name = "drazex-eks-aws-load-balancer-controller-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -303,7 +303,7 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
   })
 
   tags = {
-    Name        = "hutch_eks_aws_load_balancer_controller_role"
+    Name        = "drazex_eks_aws_load_balancer_controller_role"
     Environment = var.environment
   }
 }

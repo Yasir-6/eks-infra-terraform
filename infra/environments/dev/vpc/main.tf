@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "hutch-eks-terraform-statefiles"
+    bucket         = "drazex-eks-terraform-statefiles"
     key            = "dev/vpc/terraform.tfstate"
     region         = "us-east-2"
-    dynamodb_table = "eks-terraform-state-lock"
+    dynamodb_table = "drazex-eks-terraform-state-lock"
     encrypt        = true
   }
 }
@@ -23,26 +23,26 @@ module "vpc" {
 }
 
 # Outputs
-output "hutch_eks_vpc_id" {
+output "drazex_eks_vpc_id" {
   value = module.vpc.vpc_id
 }
 
-output "hutch_eks_vpc_cidr_block" {
+output "drazex_eks_vpc_cidr_block" {
   value = module.vpc.vpc_cidr_block
 }
 
-output "hutch_eks_public_subnet_ids" {
+output "drazex_eks_public_subnet_ids" {
   value = module.vpc.public_subnet_ids
 }
 
-output "hutch_eks_private_subnet_ids" {
+output "drazex_eks_private_subnet_ids" {
   value = module.vpc.private_subnet_ids
 }
 
-output "hutch_eks_internet_gateway_id" {
+output "drazex_eks_internet_gateway_id" {
   value = module.vpc.internet_gateway_id
 }
 
-output "hutch_eks_nat_gateway_ids" {
+output "drazex_eks_nat_gateway_ids" {
   value = module.vpc.nat_gateway_ids
 }

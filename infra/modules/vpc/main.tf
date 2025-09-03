@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name        = "hutch-eks-vpc-${var.environment}"
+    Name        = "drazex-eks-vpc-${var.environment}"
     Environment = var.environment
   }
 }
@@ -15,7 +15,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name        = "hutch-eks-igw-${var.environment}"
+    Name        = "drazex-eks-igw-${var.environment}"
     Environment = var.environment
   }
 }
@@ -30,10 +30,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                        = "hutch-eks-public-subnet-${count.index + 1}-${var.environment}"
+    Name                        = "drazex-eks-public-subnet-${count.index + 1}-${var.environment}"
     Environment                 = var.environment
     "kubernetes.io/role/elb"    = "1"
-    "kubernetes.io/cluster/hutch-eks-cluster-${var.environment}" = "shared"
+    "kubernetes.io/cluster/drazex-eks-cluster-${var.environment}" = "shared"
   }
 }
 
@@ -45,10 +45,10 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name                                 = "hutch-eks-private-subnet-${count.index + 1}-${var.environment}"
+    Name                                 = "drazex-eks-private-subnet-${count.index + 1}-${var.environment}"
     Environment                          = var.environment
     "kubernetes.io/role/internal-elb"    = "1"
-    "kubernetes.io/cluster/hutch-eks-cluster-${var.environment}" = "shared"
+    "kubernetes.io/cluster/drazex-eks-cluster-${var.environment}" = "shared"
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_eip" "nat" {
   depends_on = [aws_internet_gateway.main]
 
   tags = {
-    Name        = "hutch-eks-nat-eip-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-nat-eip-${count.index + 1}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -74,7 +74,7 @@ resource "aws_nat_gateway" "main" {
   depends_on = [aws_internet_gateway.main]
 
   tags = {
-    Name        = "hutch-eks-nat-gateway-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-nat-gateway-${count.index + 1}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -89,7 +89,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name        = "hutch-eks-public-rt-${var.environment}"
+    Name        = "drazex-eks-public-rt-${var.environment}"
     Environment = var.environment
   }
 }
@@ -112,7 +112,7 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name        = "hutch-eks-private-rt-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-private-rt-${count.index + 1}-${var.environment}"
     Environment = var.environment
   }
 }
