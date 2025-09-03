@@ -1,0 +1,80 @@
+name: 'EKS Terraform Destroy'
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "destroy" to confirm'
+        required: true
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  destroy-eks:
+    name: 'Destroy EKS'
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.event.inputs.confirm_destroy == 'destroy'
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infra/environments/dev/eks
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.6.0"
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -input=false
+
+  destroy-vpc:
+    name: 'Destroy VPC'
+    runs-on: ubuntu-latest
+    environment: production
+    needs: destroy-eks
+    if: github.event.inputs.confirm_destroy == 'destroy'
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infra/environments/dev/vpc
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.6.0"
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -input=false
