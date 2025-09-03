@@ -63,7 +63,7 @@ variable "capacity_type" {
 variable "ami_type" {
   description = "Type of Amazon Machine Image (AMI) associated with the EKS Node Group"
   type        = string
-  default     = "AL2_x86_64"
+  default     = "AL2023_x86_64_STANDARD"
 }
 
 variable "disk_size" {

@@ -1,7 +1,7 @@
 # Terraform
 *.tfstate
 *.tfstate.*
-*.tfvars
+# *.tfvars  # Commented out to allow terraform.tfvars files
 !terraform.tfvars.example
 .terraform/
 .terraform.lock.hcl
