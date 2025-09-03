@@ -397,66 +397,66 @@ resource "aws_iam_role_policy" "aws_load_balancer_controller_additional" {
 
 # EKS Add-ons
 resource "aws_eks_addon" "vpc_cni" {
-  cluster_name             = aws_eks_cluster.main.name
-  addon_name               = "vpc-cni"
-  addon_version            = var.vpc_cni_version
-  resolve_conflicts        = "OVERWRITE"
-  service_account_role_arn = aws_iam_role.vpc_cni.arn
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "vpc-cni"
+  addon_version               = var.vpc_cni_version
+  resolve_conflicts_on_create = "OVERWRITE"
+  service_account_role_arn    = aws_iam_role.vpc_cni.arn
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "coredns" {
-  cluster_name      = aws_eks_cluster.main.name
-  addon_name        = "coredns"
-  addon_version     = var.coredns_version
-  resolve_conflicts = "OVERWRITE"
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "coredns"
+  addon_version               = var.coredns_version
+  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name      = aws_eks_cluster.main.name
-  addon_name        = "kube-proxy"
-  addon_version     = var.kube_proxy_version
-  resolve_conflicts = "OVERWRITE"
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "kube-proxy"
+  addon_version               = var.kube_proxy_version
+  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "ebs_csi" {
-  cluster_name             = aws_eks_cluster.main.name
-  addon_name               = "aws-ebs-csi-driver"
-  addon_version            = var.ebs_csi_version
-  resolve_conflicts        = "OVERWRITE"
-  service_account_role_arn = aws_iam_role.ebs_csi.arn
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-ebs-csi-driver"
+  addon_version               = var.ebs_csi_version
+  resolve_conflicts_on_create = "OVERWRITE"
+  service_account_role_arn    = aws_iam_role.ebs_csi.arn
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "aws_efs_csi_driver" {
-  cluster_name      = aws_eks_cluster.main.name
-  addon_name        = "aws-efs-csi-driver"
-  addon_version     = var.efs_csi_version
-  resolve_conflicts = "OVERWRITE"
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-efs-csi-driver"
+  addon_version               = var.efs_csi_version
+  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "aws_guardduty_agent" {
-  count             = var.enable_guardduty_agent ? 1 : 0
-  cluster_name      = aws_eks_cluster.main.name
-  addon_name        = "aws-guardduty-agent"
-  resolve_conflicts = "OVERWRITE"
+  count                       = var.enable_guardduty_agent ? 1 : 0
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-guardduty-agent"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_addon" "adot" {
-  count             = var.enable_adot ? 1 : 0
-  cluster_name      = aws_eks_cluster.main.name
-  addon_name        = "adot"
-  resolve_conflicts = "OVERWRITE"
+  count                       = var.enable_adot ? 1 : 0
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "adot"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   depends_on = [aws_eks_node_group.main]
 }
