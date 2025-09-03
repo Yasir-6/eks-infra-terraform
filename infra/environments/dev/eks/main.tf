@@ -24,29 +24,29 @@ provider "aws" {
 module "eks" {
   source = "../../../modules/eks"
 
-  environment             = "dev"
-  vpc_id                  = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_id
-  vpc_cidr                = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_cidr_block
-  private_subnet_ids      = data.terraform_remote_state.vpc.outputs.drazex_eks_private_subnet_ids
-  kubernetes_version      = var.kubernetes_version
-  endpoint_public_access  = var.endpoint_public_access
-  public_access_cidrs     = var.public_access_cidrs
-  cluster_log_types       = var.cluster_log_types
-  log_retention_days      = var.log_retention_days
-  node_instance_types     = var.node_instance_types
-  capacity_type           = var.capacity_type
-  ami_type                = var.ami_type
-  disk_size               = var.disk_size
-  desired_size            = var.desired_size
-  max_size                = var.max_size
-  min_size                = var.min_size
-  vpc_cni_version         = var.vpc_cni_version
-  coredns_version         = var.coredns_version
-  kube_proxy_version      = var.kube_proxy_version
-  ebs_csi_version         = var.ebs_csi_version
-  efs_csi_version         = var.efs_csi_version
-  enable_guardduty_agent  = var.enable_guardduty_agent
-  enable_adot             = var.enable_adot
+  environment            = "dev"
+  vpc_id                 = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_id
+  vpc_cidr               = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_cidr_block
+  private_subnet_ids     = data.terraform_remote_state.vpc.outputs.drazex_eks_private_subnet_ids
+  kubernetes_version     = var.kubernetes_version
+  endpoint_public_access = var.endpoint_public_access
+  public_access_cidrs    = var.public_access_cidrs
+  cluster_log_types      = var.cluster_log_types
+  log_retention_days     = var.log_retention_days
+  node_instance_types    = var.node_instance_types
+  capacity_type          = var.capacity_type
+  ami_type               = var.ami_type
+  disk_size              = var.disk_size
+  desired_size           = var.desired_size
+  max_size               = var.max_size
+  min_size               = var.min_size
+  vpc_cni_version        = var.vpc_cni_version
+  coredns_version        = var.coredns_version
+  kube_proxy_version     = var.kube_proxy_version
+  ebs_csi_version        = var.ebs_csi_version
+  efs_csi_version        = var.efs_csi_version
+  enable_guardduty_agent = var.enable_guardduty_agent
+  enable_adot            = var.enable_adot
 }
 
 output "drazex_eks_cluster_id" {
