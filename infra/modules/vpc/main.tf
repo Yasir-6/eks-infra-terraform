@@ -49,26 +49,24 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_eip" "nat" {
-  count  = length(var.public_subnet_cidrs)
   domain = "vpc"
 
   depends_on = [aws_internet_gateway.main]
 
   tags = {
-    Name        = "drazex-eks-nat-eip-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-nat-eip-${var.environment}"
     Environment = var.environment
   }
 }
 
 resource "aws_nat_gateway" "main" {
-  count         = length(var.public_subnet_cidrs)
-  allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
 
   depends_on = [aws_internet_gateway.main]
 
   tags = {
-    Name        = "drazex-eks-nat-gateway-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-nat-gateway-${var.environment}"
     Environment = var.environment
   }
 }
@@ -94,16 +92,15 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_route_table" "private" {
-  count  = length(var.private_subnet_cidrs)
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main[count.index].id
+    nat_gateway_id = aws_nat_gateway.main.id
   }
 
   tags = {
-    Name        = "drazex-eks-private-rt-${count.index + 1}-${var.environment}"
+    Name        = "drazex-eks-private-rt-${var.environment}"
     Environment = var.environment
   }
 }
@@ -111,5 +108,5 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }

@@ -25,7 +25,7 @@ output "private_subnet_ids" {
 
 output "nat_gateway_ids" {
   description = "List of IDs of the NAT Gateways"
-  value       = aws_nat_gateway.main[*].id
+  value       = [aws_nat_gateway.main.id]
 }
 
 output "public_route_table_id" {
@@ -35,5 +35,5 @@ output "public_route_table_id" {
 
 output "private_route_table_ids" {
   description = "List of IDs of the private route tables"
-  value       = aws_route_table.private[*].id
+  value       = [aws_route_table.private.id]
 }
