@@ -24,9 +24,9 @@ provider "aws" {
 module "eks" {
   source = "../../../modules/eks"
 
-  environment            = "dev"
-  vpc_id                 = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_id
-  vpc_cidr               = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_cidr_block
+  environment             = "dev"
+  vpc_id                  = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_id
+  vpc_cidr                = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_cidr_block
   private_subnet_ids      = data.terraform_remote_state.vpc.outputs.task_app_eks_private_subnet_ids
   public_subnet_ids       = data.terraform_remote_state.vpc.outputs.task_app_eks_public_subnet_ids
   kubernetes_version      = var.kubernetes_version
