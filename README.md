@@ -107,7 +107,7 @@ After deployment, configure kubectl:
 aws eks update-kubeconfig --region us-east-2 --name task-app-eks-cluster-dev
 ```
 
-## Cleanup..
+## Cleanup...
 
 To destroy the infrastructure:
 
