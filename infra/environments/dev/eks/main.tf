@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "drazex-eks-terraform-statefiles-12345"
+    bucket         = "task-app-eks-terraform-statefiles-12345"
     key            = "dev/eks/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "drazex-eks-terraform-state-lock"
+    dynamodb_table = "task-app-eks-terraform-state-lock"
     encrypt        = true
   }
 }
@@ -11,7 +11,7 @@ terraform {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "drazex-eks-terraform-statefiles-12345"
+    bucket = "task-app-eks-terraform-statefiles-12345"
     key    = "dev/vpc/terraform.tfstate"
     region = "us-east-1"
   }
@@ -25,10 +25,10 @@ module "eks" {
   source = "../../../modules/eks"
 
   environment            = "dev"
-  vpc_id                 = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_id
-  vpc_cidr               = data.terraform_remote_state.vpc.outputs.drazex_eks_vpc_cidr_block
-  private_subnet_ids      = data.terraform_remote_state.vpc.outputs.drazex_eks_private_subnet_ids
-  public_subnet_ids       = data.terraform_remote_state.vpc.outputs.drazex_eks_public_subnet_ids
+  vpc_id                 = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_id
+  vpc_cidr               = data.terraform_remote_state.vpc.outputs.task_app_eks_vpc_cidr_block
+  private_subnet_ids      = data.terraform_remote_state.vpc.outputs.task_app_eks_private_subnet_ids
+  public_subnet_ids       = data.terraform_remote_state.vpc.outputs.task_app_eks_public_subnet_ids
   kubernetes_version      = var.kubernetes_version
   endpoint_public_access  = var.endpoint_public_access
   endpoint_private_access = var.endpoint_private_access
@@ -52,42 +52,42 @@ module "eks" {
   enable_adot            = var.enable_adot
 }
 
-output "drazex_eks_cluster_id" {
+output "task_app_eks_cluster_id" {
   value = module.eks.cluster_id
 }
 
-output "drazex_eks_cluster_arn" {
+output "task_app_eks_cluster_arn" {
   value = module.eks.cluster_arn
 }
 
-output "drazex_eks_cluster_endpoint" {
+output "task_app_eks_cluster_endpoint" {
   value = module.eks.cluster_endpoint
 }
 
-output "drazex_eks_cluster_name" {
+output "task_app_eks_cluster_name" {
   value = module.eks.cluster_name
 }
 
-output "drazex_eks_cluster_version" {
+output "task_app_eks_cluster_version" {
   value = module.eks.cluster_version
 }
 
-output "drazex_eks_cluster_security_group_id" {
+output "task_app_eks_cluster_security_group_id" {
   value = module.eks.cluster_security_group_id
 }
 
-output "drazex_eks_node_security_group_id" {
+output "task_app_eks_node_security_group_id" {
   value = module.eks.node_security_group_id
 }
 
-output "drazex_eks_node_group_arn" {
+output "task_app_eks_node_group_arn" {
   value = module.eks.node_group_arn
 }
 
-output "drazex_eks_cluster_certificate_authority_data" {
+output "task_app_eks_cluster_certificate_authority_data" {
   value = module.eks.cluster_certificate_authority_data
 }
 
-output "drazex_eks_cluster_oidc_issuer_url" {
+output "task_app_eks_cluster_oidc_issuer_url" {
   value = module.eks.cluster_oidc_issuer_url
 }

@@ -19,8 +19,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  TF_STATE_BUCKET: "drazex-eks-terraform-statefiles-12345"
-  TF_STATE_LOCK_TABLE: "drazex-eks-terraform-state-lock"
+  TF_STATE_BUCKET: "task-app-eks-terraform-statefiles-12345"
+  TF_STATE_LOCK_TABLE: "task-app-eks-terraform-state-lock"
 
 permissions:
   contents: read

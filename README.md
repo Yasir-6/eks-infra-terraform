@@ -104,7 +104,7 @@ The VPC module creates:
 After deployment, configure kubectl:
 
 ```bash
-aws eks update-kubeconfig --region us-east-2 --name hutch-eks-cluster-dev
+aws eks update-kubeconfig --region us-east-2 --name task-app-eks-cluster-dev
 ```
 
 ## Cleanup..

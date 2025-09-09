@@ -9,8 +9,8 @@ on:
 env:
   AWS_REGION: us-east-1
   ENVIRONMENT: dev
-  TF_STATE_BUCKET: "drazex-eks-terraform-statefiles-12345"
-  TF_STATE_LOCK_TABLE: "drazex-eks-terraform-state-lock"
+  TF_STATE_BUCKET: "task-app-eks-terraform-statefiles-12345"
+  TF_STATE_LOCK_TABLE: "task-app-eks-terraform-state-lock"
 
 permissions:
   contents: read
@@ -194,5 +194,5 @@ jobs:
 
       - name: Configure kubectl
         run: |
-          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name drazex-eks-cluster-${{ env.ENVIRONMENT }}
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name task-app-eks-cluster-${{ env.ENVIRONMENT }}
           kubectl get nodes

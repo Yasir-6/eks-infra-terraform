@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "drazex-eks-terraform-statefiles-12345"
+    bucket         = "task-app-eks-terraform-statefiles-12345"
     key            = "dev/vpc/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "drazex-eks-terraform-state-lock"
+    dynamodb_table = "task-app-eks-terraform-state-lock"
     encrypt        = true
   }
 }
@@ -22,26 +22,26 @@ module "vpc" {
   private_subnet_cidrs = var.private_subnet_cidrs
 }
 
-output "drazex_eks_vpc_id" {
+output "task_app_eks_vpc_id" {
   value = module.vpc.vpc_id
 }
 
-output "drazex_eks_vpc_cidr_block" {
+output "task_app_eks_vpc_cidr_block" {
   value = module.vpc.vpc_cidr_block
 }
 
-output "drazex_eks_public_subnet_ids" {
+output "task_app_eks_public_subnet_ids" {
   value = module.vpc.public_subnet_ids
 }
 
-output "drazex_eks_private_subnet_ids" {
+output "task_app_eks_private_subnet_ids" {
   value = module.vpc.private_subnet_ids
 }
 
-output "drazex_eks_internet_gateway_id" {
+output "task_app_eks_internet_gateway_id" {
   value = module.vpc.internet_gateway_id
 }
 
-output "drazex_eks_nat_gateway_ids" {
+output "task_app_eks_nat_gateway_ids" {
   value = module.vpc.nat_gateway_ids
 }

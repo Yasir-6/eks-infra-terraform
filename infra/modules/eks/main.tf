@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks_cluster" {
-  name = "drazex-eks-cluster-role-${var.environment}"
+  name = "task-app-eks-cluster-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_role" "eks_cluster" {
   })
 
   tags = {
-    Name        = "drazex_eks_cluster_role"
+    Name        = "task_app_eks_cluster_role"
     Environment = var.environment
   }
 }
@@ -26,7 +26,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 }
 
 resource "aws_iam_role" "eks_node" {
-  name = "drazex-eks-node-role-${var.environment}"
+  name = "task-app-eks-node-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -42,7 +42,7 @@ resource "aws_iam_role" "eks_node" {
   })
 
   tags = {
-    Name        = "drazex_eks_node_role"
+    Name        = "task_app_eks_node_role"
     Environment = var.environment
   }
 }
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "eks_container_registry_policy" {
 }
 
 resource "aws_security_group" "eks_cluster" {
-  name        = "drazex-eks-cluster-sg-${var.environment}"
+  name        = "task-app-eks-cluster-sg-${var.environment}"
   description = "Security group for EKS cluster"
   vpc_id      = var.vpc_id
 
@@ -82,13 +82,13 @@ resource "aws_security_group" "eks_cluster" {
   }
 
   tags = {
-    Name        = "drazex_eks_cluster_security_group"
+    Name        = "task_app_eks_cluster_security_group"
     Environment = var.environment
   }
 }
 
 resource "aws_security_group" "eks_nodes" {
-  name        = "drazex-eks-nodes-sg-${var.environment}"
+  name        = "task-app-eks-nodes-sg-${var.environment}"
   description = "Security group for EKS nodes"
   vpc_id      = var.vpc_id
 
@@ -114,23 +114,23 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   tags = {
-    Name        = "drazex_eks_nodes_security_group"
+    Name        = "task_app_eks_nodes_security_group"
     Environment = var.environment
   }
 }
 
 resource "aws_cloudwatch_log_group" "eks" {
-  name              = "/aws/eks/drazex-eks-cluster-${var.environment}/cluster"
+  name              = "/aws/eks/task-app-eks-cluster-${var.environment}/cluster"
   retention_in_days = var.log_retention_days
 
   tags = {
-    Name        = "drazex_eks_log_group"
+    Name        = "task_app_eks_log_group"
     Environment = var.environment
   }
 }
 
 resource "aws_eks_cluster" "main" {
-  name     = "drazex-eks-cluster-${var.environment}"
+  name     = "task-app-eks-cluster-${var.environment}"
   role_arn = aws_iam_role.eks_cluster.arn
   version  = var.kubernetes_version
 
@@ -150,14 +150,14 @@ resource "aws_eks_cluster" "main" {
   ]
 
   tags = {
-    Name        = "drazex_eks_cluster"
+    Name        = "task_app_eks_cluster"
     Environment = var.environment
   }
 }
 
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "drazex-eks-nodes-${var.environment}"
+  node_group_name = "task-app-eks-nodes-${var.environment}"
   node_role_arn   = aws_iam_role.eks_node.arn
   subnet_ids      = var.use_private_subnets ? var.private_subnet_ids : var.public_subnet_ids
 
@@ -177,7 +177,7 @@ resource "aws_eks_node_group" "main" {
   }
 
   tags = {
-    Name        = "drazex_eks_node_group"
+    Name        = "task_app_eks_node_group"
     Environment = var.environment
   }
 
@@ -198,13 +198,13 @@ resource "aws_iam_openid_connect_provider" "eks" {
   url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
 
   tags = {
-    Name        = "drazex_eks_oidc_provider"
+    Name        = "task_app_eks_oidc_provider"
     Environment = var.environment
   }
 }
 
 resource "aws_iam_role" "vpc_cni" {
-  name = "drazex-eks-vpc-cni-role-${var.environment}"
+  name = "task-app-eks-vpc-cni-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -226,7 +226,7 @@ resource "aws_iam_role" "vpc_cni" {
   })
 
   tags = {
-    Name        = "drazex_eks_vpc_cni_role"
+    Name        = "task_app_eks_vpc_cni_role"
     Environment = var.environment
   }
 }
@@ -237,7 +237,7 @@ resource "aws_iam_role_policy_attachment" "vpc_cni" {
 }
 
 resource "aws_iam_role" "ebs_csi" {
-  name = "drazex-eks-ebs-csi-role-${var.environment}"
+  name = "task-app-eks-ebs-csi-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -259,7 +259,7 @@ resource "aws_iam_role" "ebs_csi" {
   })
 
   tags = {
-    Name        = "drazex_eks_ebs_csi_role"
+    Name        = "task_app_eks_ebs_csi_role"
     Environment = var.environment
   }
 }
