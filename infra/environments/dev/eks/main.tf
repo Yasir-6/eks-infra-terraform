@@ -34,22 +34,22 @@ module "eks" {
   endpoint_private_access = var.endpoint_private_access
   public_access_cidrs     = var.public_access_cidrs
   use_private_subnets     = var.use_private_subnets
-  cluster_log_types      = var.cluster_log_types
-  log_retention_days     = var.log_retention_days
-  node_instance_types    = var.node_instance_types
-  capacity_type          = var.capacity_type
-  ami_type               = var.ami_type
-  disk_size              = var.disk_size
-  desired_size           = var.desired_size
-  max_size               = var.max_size
-  min_size               = var.min_size
-  vpc_cni_version        = var.vpc_cni_version
-  coredns_version        = var.coredns_version
-  kube_proxy_version     = var.kube_proxy_version
-  ebs_csi_version        = var.ebs_csi_version
-  efs_csi_version        = var.efs_csi_version
-  enable_guardduty_agent = var.enable_guardduty_agent
-  enable_adot            = var.enable_adot
+  cluster_log_types       = var.cluster_log_types
+  log_retention_days      = var.log_retention_days
+  node_instance_types     = var.node_instance_types
+  capacity_type           = var.capacity_type
+  ami_type                = var.ami_type
+  disk_size               = var.disk_size
+  desired_size            = var.desired_size
+  max_size                = var.max_size
+  min_size                = var.min_size
+  vpc_cni_version         = var.vpc_cni_version
+  coredns_version         = var.coredns_version
+  kube_proxy_version      = var.kube_proxy_version
+  ebs_csi_version         = var.ebs_csi_version
+  efs_csi_version         = var.efs_csi_version
+  enable_guardduty_agent  = var.enable_guardduty_agent
+  enable_adot             = var.enable_adot
 }
 
 output "task_app_eks_cluster_id" {
